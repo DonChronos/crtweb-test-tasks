@@ -6,6 +6,9 @@ import {
   selectTurnNo,
   selectPairsFound,
   selectCards,
+  selectNumClick,
+  selectFirstId,
+  selectSecondId,
   gameInit,
   flipUpCard,
   checkMatchedPair,
@@ -23,15 +26,20 @@ export default function GameView() {
   const turnNo = useSelector(selectTurnNo);
   const pairsFound = useSelector(selectPairsFound);
   const cards = useSelector(selectCards);
+  const numClick = useSelector(selectNumClick);
+  const firstId = useSelector(selectFirstId);
+  const secondId = useSelector(selectSecondId);
   const dispatch = useDispatch();
+  
   const onCardClicked = id => {
 	  clearInterval(timeOut);
-	  dispatch(flipUpCard(id));
-	  dispatch(checkMatchedPair());
+	  dispatch(flipUpCard({id, numClick, firstId, secondId, cards, pairsFound}));
+	  dispatch(checkMatchedPair({numClick, firstId, secondId, cards, pairsFound}));
 	  timeOut = setTimeout(() => {
-		  dispatch(checkUnmatchedPair())
+		  dispatch(checkUnmatchedPair({numClick, firstId, secondId, cards}))
 	  }, 5000);
   }
+  
   const getCardViews = () => cards.map(c => <CardView key={c.id}
 											 id={c.id}
 											 image={c.image}

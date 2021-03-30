@@ -27,31 +27,31 @@ export const gameSlice = createSlice({
 			return { payload: cards };
 		},
 	},
-	checkUnmatchedPair: state => {
-		if (state.numClickWithinTurn === 2 && !cardsHaveIdenticalImages(state.firstId, state.secondId, state.cards)) {
+	checkUnmatchedPair: (state, action) => {
+		if (action.payload.numClick === 2 && !cardsHaveIdenticalImages(action.payload.firstId, action.payload.secondId, action.payload.cards)) {
 			state.numClickWithinTurn = 0;
-			state.cards = state.cards.map(card => {
-				if (state.firstId === card.id || state.secondId === card.id) {
+			state.firstId = undefined;
+			state.secondId = undefined;
+			state.turnNo += 1;
+			state.cards = action.payload.cards.map(card => {
+				if (action.payload.firstId === card.id || action.payload.secondId === card.id) {
 					card.imageUp = false;
 				}
 				return card;
 			});
-			state.firstId = undefined;
-			state.secondId = undefined;
-			state.turnNo += 1;
 		}
 	},
-	checkMatchedPair: state => {
-		if (state.numClickWithinTurn === 2 && cardsHaveIdenticalImages(state.firstId, state.secondId, state.cards)) {
-			state.pairsFound += 1;
+	checkMatchedPair: (state, action) => {
+		if (action.payload.numClick === 2 && cardsHaveIdenticalImages(action.payload.firstId, action.payload.secondId, action.payload.cards)) {
+			let pairsFound = action.payload.pairsFound + 1;
 			state.gameComplete = false;
-			if (state.pairsFound === state.cards.length / 2) {
+			if (pairsFound === action.payload.cards.length / 2) {
 				state.gameComplete = true;
 			}
 			state.turnNo += 1;
 			state.numClickWithinTurn = 0;
-			state.cards = state.cards.map(card => {
-				if (state.firstId === card.id || state.secondId === card.id) {
+			state.cards = action.payload.cards.map(card => {
+				if (action.payload.firstId === card.id || action.payload.secondId === card.id) {
 					card.matched = true;
 				}
 				return card;
@@ -60,65 +60,63 @@ export const gameSlice = createSlice({
 	},
 	flipUpCard: (state, action) => {
 		console.log(action);
-		console.log(state);
-		console.log({ key: state.cards });
-		console.log(state.cards);
-		let cards = state.cards;
+		let id = action.payload.id;
+		let cards = action.payload.cards;
 		console.log(cards);
-		let card = getCard(action.payload, state.cards);
+		let card = getCard(id, cards);
 		console.log(card);
 		if (card.imageUp || card.matched) {
 			return;
 		}
-		if (state.numClickWithinTurn === 2) {
-			if (cardsHaveIdenticalImages(state.firstId, state.secondId, state.cards)) {
+		if (action.payload.numClick === 2) {
+			if (cardsHaveIdenticalImages(action.payload.firstId, action.payload.secondId, action.payload.cards)) {
 			state.pairsFound += 1;
 			state.gameComplete = false;
-			if (state.pairsFound === state.cards.length / 2) {
+			if (action.payload.pairsFound === action.payload.cards.length / 2) {
 				state.gameComplete = true;
 			}
 			state.turnNo += 1;
 			state.numClickWithinTurn = 0;
-			state.cards = state.cards.map(card => {
-				if (state.firstId === card.id || state.secondId === card.id) {
+			state.cards = action.payload.cards.map(card => {
+				if (action.payload.firstId === card.id || action.payload.secondId === card.id) {
 					card.matched = true;
 				}
 				return card;
 			});
 			}
-			if (state.numClickWithinTurn === 2 && !cardsHaveIdenticalImages(state.firstId, state.secondId, state.cards)) {
+			if (!cardsHaveIdenticalImages(action.payload.firstId, action.payload.secondId, action.payload.cards)) {
 			state.numClickWithinTurn = 0;
-			state.cards = state.cards.map(card => {
-				if (state.firstId === card.id || state.secondId === card.id) {
+			state.firstId = undefined;
+			state.secondId = undefined;
+			state.turnNo += 1;
+			state.cards = action.payload.cards.map(card => {
+				if (action.payload.firstId === card.id || action.payload.secondId === card.id) {
 					card.imageUp = false;
 				}
 				return card;
 			});
-			state.firstId = undefined;
-			state.secondId = undefined;
-			state.turnNo += 1;
 			}
-			state.firstId = action.payload;
+			state.firstId = id;
 			state.numClickWithinTurn = 1;
-			state.cards = state.cards.map(card => {
-				if (action.payload === card.id) {
+			state.cards = action.payload.cards.map(card => {
+				if (id === card.id) {
 					card.imageUp = true;
 				}
 				return card;
 			});
 		}
-		let firstId = state.firstId;
-		let secondId = state.secondId;
-		if (state.numClickWithinTurn === 0) {
-			firstId = action.payload;
+		let firstId = action.payload.firstId;
+		let secondId = action.payload.secondId;
+		if (action.payload.numClick === 0) {
+			firstId = id;
 		} else {
-			secondId = action.payload;
+			secondId = id;
 		}
 		state.firstId = firstId;
 		state.secondId = secondId;
 		state.numClickWithinTurn += 1;
-		state.cards = state.cards.map(card => {
-			if (action.payload === card.id) {
+		state.cards = action.payload.cards.map(card => {
+			if (id === card.id) {
 				card.imageUp = true;
 			}
 			return card;
@@ -150,5 +148,8 @@ export const selectGameComplete = state => state.game.gameComplete;
 export const selectTurnNo = state => state.game.turnNo;
 export const selectPairsFound = state => state.game.pairsFound;
 export const selectCards = state => state.game.cards;
+export const selectNumClick = state => state.game.numClickWithinTurn;
+export const selectFirstId = state => state.game.firstId;
+export const selectSecondId = state => state.game.secondId;
 
 export default gameSlice.reducer;
