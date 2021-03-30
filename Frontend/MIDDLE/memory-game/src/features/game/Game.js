@@ -1,28 +1,42 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  decrement,
-  increment,
-  incrementByAmount,
-  incrementAsync,
-  selectCount,
+  selectGameStarted,
+  selectGameComplete,
+  selectTurnNo,
+  selectPairsFound,
 } from './gameSlice';
 import styles from './Game.module.css';
+import GameStatusView from './GameStatusView';
 
-export function Counter() {
-  const count = useSelector(selectCount);
+export default function GameView() {
+  const cardViews = undefined;
+  const gameStarted = useSelector(selectGameStarted);
+  const gameComplete = useSelector(selectGameComplete);
+  const turnNo = useSelector(selectTurnNo);
+  const pairsFound = useSelector(selectPairsFound);
+  
   const dispatch = useDispatch();
-  const [incrementAmount, setIncrementAmount] = useState('2');
+  let gameHUD = undefined;
+  if (!gameStarted) {
+	  gameHUD = <button onclick={() => dispatch()}>Play</button>;
+  } else {
+	  gameHUD = <GameStatusView
+					gameComplete={gameComplete}
+					turnNo={turnNo}
+					pairsFound={pairsFound}
+				/>;
+  }
 
   return (
 	<div className={styles.game}>
-		<header className={styles.game-header}>
-			<div className={styles.game-title}>Game in React</div>
+		<header className={styles.game_header}>
+			<div className={styles.game_title}>Game in React</div>
 		</header>
-		<div className={styles.game-status}>
+		<div className={styles.game_status}>
 			{gameHUD}
 		</div>
-		<div className={styles.card-container}>
+		<div className={styles.card_container}>
 			{cardViews}
 		</div>
 	</div>

@@ -1,12 +1,9 @@
 import React from 'react';
-import GameView from './features/game/Game';
+import Game from './features/game/Game';
 
 function App() {
   return (
-    <>
-    <GameView />
-	<Results />
-	</>
+    <Game />
   );
 }
 
