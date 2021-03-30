@@ -76,7 +76,7 @@ img {
   transform-style: preserve-3d;
 }
 
-.animate .flip_card_inner {
+.animate div {
   transform: rotateY(180deg);
 }
 

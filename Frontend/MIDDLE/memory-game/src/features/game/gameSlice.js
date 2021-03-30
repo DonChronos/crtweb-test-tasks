@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import shuffle from 'shuffle-array';
 import { generateCardSet, getCard, cardsHaveIdenticalImages } from './cardFunctions';
 
+
 export const gameSlice = createSlice({
   name: 'game',
   initialState: {
@@ -98,12 +99,8 @@ export const gameSlice = createSlice({
 			}
 			state.firstId = id;
 			state.numClickWithinTurn = 1;
-			state.cards = action.payload.cards.map(card => {
-				if (id === card.id) {
-					card.imageUp = true;
-				}
-				return card;
-			});
+			let foundCardIndex = action.payload.cards.findIndex(card => id === card.id);
+			state.cards[foundCardIndex].imageUp = true;
 		}
 		let firstId = action.payload.firstId;
 		let secondId = action.payload.secondId;
@@ -115,15 +112,13 @@ export const gameSlice = createSlice({
 		state.firstId = firstId;
 		state.secondId = secondId;
 		state.numClickWithinTurn += 1;
-		state.cards = action.payload.cards.map(card => {
-			if (id === card.id) {
-				card.imageUp = true;
-			}
-			return card;
-		});
+		let foundCardIndex = action.payload.cards.findIndex(card => id === card.id);
+		state.cards[foundCardIndex].imageUp = true;
 	},
   },
 });
+
+//current(state)
 
 export const { gameInit, flipUpCard, checkMatchedPair, checkUnmatchedPair } = gameSlice.actions;
 //export const { increment, decrement, incrementByAmount } = counterSlice.actions;
