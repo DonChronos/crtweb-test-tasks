@@ -36,6 +36,7 @@ export const gameSlice = createSlice({
 				if (state.firstId === card.id || state.secondId === card.id) {
 					card.imageUp = false;
 				}
+				return card;
 			});
 			state.firstId = undefined;
 			state.secondId = undefined;
@@ -55,6 +56,7 @@ export const gameSlice = createSlice({
 				if (state.firstId === card.id || state.secondId === card.id) {
 					card.matched = true;
 				}
+				return card;
 			})
 		}
 	},
@@ -76,6 +78,7 @@ export const gameSlice = createSlice({
 				if (state.firstId === card.id || state.secondId === card.id) {
 					card.matched = true;
 				}
+				return card;
 			});
 			}
 			if (state.numClickWithinTurn === 2 && !cardsHaveIdenticalImages(state.firstId, state.secondId, state.cards)) {
@@ -84,6 +87,7 @@ export const gameSlice = createSlice({
 				if (state.firstId === card.id || state.secondId === card.id) {
 					card.imageUp = false;
 				}
+				return card;
 			});
 			state.firstId = undefined;
 			state.secondId = undefined;
@@ -95,6 +99,7 @@ export const gameSlice = createSlice({
 				if (action.id === card.id) {
 					card.imageUp = true;
 				}
+				return card;
 			});
 		}
 		let firstId = state.firstId;
@@ -111,12 +116,13 @@ export const gameSlice = createSlice({
 			if (action.id === card.id) {
 				card.imageUp = true;
 			}
+			return card;
 		});
 	},
   },
 });
 
-export const { gameInit } = gameSlice.actions;
+export const { gameInit, flipUpCard, checkMatchedPair, checkUnmatchedPair } = gameSlice.actions;
 //export const { increment, decrement, incrementByAmount } = counterSlice.actions;
 
 // The function below is called a thunk and allows us to perform async logic. It

@@ -7,6 +7,9 @@ import {
   selectPairsFound,
   selectCards,
   gameInit,
+  flipUpCard,
+  checkMatchedPair,
+  checkUnmatchedPair,
 } from './gameSlice';
 import styles from './Game.module.css';
 import GameStatusView from './GameStatusView';
