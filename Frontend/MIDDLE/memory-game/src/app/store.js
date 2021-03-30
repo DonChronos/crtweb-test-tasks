@@ -4,7 +4,6 @@ import gameReducer from '../features/game/gameSlice';
 
 export default configureStore({
   reducer: {
-    counter: counterReducer,
 	game: gameReducer,
   },
 });

@@ -1,4 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
+import shuffle from 'shuffle-array';
+import { generateCardSet, getCard, cardsHaveIdenticalImages } from './cardFunctions';
 
 export const gameSlice = createSlice({
   name: 'game',
@@ -14,15 +16,107 @@ export const gameSlice = createSlice({
   },
   reducers: {
     increment: state => {
-      // Redux Toolkit allows us to write "mutating" logic in reducers. It
-      // doesn't actually mutate the state because it uses the Immer library,
-      // which detects changes to a "draft state" and produces a brand new
-      // immutable state based off those changes
       state.value += 1;
     },
+	gameInit: {
+		reducer: (state, action) => {
+			state.gameStarted = true;
+			state.cards = action.cards;
+		},
+		prepare: () => {
+			let cards = generateCardSet();
+			cards = shuffle(cards);
+			return { cards };
+		},
+	},
+	checkUnmatchedPair: state => {
+		if (state.numClickWithinTurn === 2 && !cardsHaveIdenticalImages(state.firstId, state.secondId, state.cards)) {
+			state.numClickWithinTurn = 0;
+			state.cards = state.cards.map(card => {
+				if (state.firstId === card.id || state.secondId === card.id) {
+					card.imageUp = false;
+				}
+			});
+			state.firstId = undefined;
+			state.secondId = undefined;
+			state.turnNo += 1;
+		}
+	},
+	checkMatchedPair: state => {
+		if (state.numClickWithinTurn === 2 && cardsHaveIdenticalImages(state.firstId, state.secondId, state.cards)) {
+			state.pairsFound += 1;
+			state.gameComplete = false;
+			if (state.pairsFound === state.cards.length / 2) {
+				state.gameComplete = true;
+			}
+			state.turnNo += 1;
+			state.numClickWithinTurn = 0;
+			state.cards = state.cards.map(card => {
+				if (state.firstId === card.id || state.secondId === card.id) {
+					card.matched = true;
+				}
+			})
+		}
+	},
+	flipUpCard: (state, action) => {
+		let card = getCard(action.id, state.cards);
+		if (card.imageUp || card.matched) {
+			return;
+		}
+		if (state.numClickWithinTurn === 2) {
+			if (cardsHaveIdenticalImages(state.firstId, state.secondId, state.cards)) {
+			state.pairsFound += 1;
+			state.gameComplete = false;
+			if (state.pairsFound === state.cards.length / 2) {
+				state.gameComplete = true;
+			}
+			state.turnNo += 1;
+			state.numClickWithinTurn = 0;
+			state.cards = state.cards.map(card => {
+				if (state.firstId === card.id || state.secondId === card.id) {
+					card.matched = true;
+				}
+			});
+			}
+			if (state.numClickWithinTurn === 2 && !cardsHaveIdenticalImages(state.firstId, state.secondId, state.cards)) {
+			state.numClickWithinTurn = 0;
+			state.cards = state.cards.map(card => {
+				if (state.firstId === card.id || state.secondId === card.id) {
+					card.imageUp = false;
+				}
+			});
+			state.firstId = undefined;
+			state.secondId = undefined;
+			state.turnNo += 1;
+			}
+			state.firstId = action.id;
+			state.numClickWithinTurn = 1;
+			state.cards = state.cards.map(card => {
+				if (action.id === card.id) {
+					card.imageUp = true;
+				}
+			});
+		}
+		let firstId = state.firstId;
+		let secondId = state.secondId;
+		if (state.numClickWithinTurn === 0) {
+			firstId = action.id;
+		} else {
+			secondId = action.id;
+		}
+		state.firstId = firstId;
+		state.secondId = secondId;
+		state.numClickWithinTurn += 1;
+		state.cards = state.cards.map(card => {
+			if (action.id === card.id) {
+				card.imageUp = true;
+			}
+		});
+	},
   },
 });
 
+export const { gameInit } = gameSlice.actions;
 //export const { increment, decrement, incrementByAmount } = counterSlice.actions;
 
 // The function below is called a thunk and allows us to perform async logic. It
@@ -44,5 +138,6 @@ export const selectGameStarted = state => state.game.gameStarted;
 export const selectGameComplete = state => state.game.gameComplete;
 export const selectTurnNo = state => state.game.turnNo;
 export const selectPairsFound = state => state.game.pairsFound;
+export const selectCards = state => state.game.cards;
 
 export default gameSlice.reducer;

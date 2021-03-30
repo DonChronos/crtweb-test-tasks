@@ -5,21 +5,42 @@ import {
   selectGameComplete,
   selectTurnNo,
   selectPairsFound,
+  selectCards,
+  gameInit,
 } from './gameSlice';
 import styles from './Game.module.css';
 import GameStatusView from './GameStatusView';
+import CardView from './cardView';
+
+let timeOut = null;
 
 export default function GameView() {
-  const cardViews = undefined;
   const gameStarted = useSelector(selectGameStarted);
   const gameComplete = useSelector(selectGameComplete);
   const turnNo = useSelector(selectTurnNo);
   const pairsFound = useSelector(selectPairsFound);
-  
+  const cards = useSelector(selectCards);
   const dispatch = useDispatch();
+  const onCardClicked = id => {
+	  clearInterval(timeOut);
+	  dispatch(flipUpCard(id));
+	  dispatch(checkMatchedPair());
+	  timeOut = setTimeout(() => {
+		  dispatch(checkUnmatchedPair())
+	  }, 5000);
+  }
+  
+  const cardViews = cards.map(c => <CardView key={c.id}
+											 id={c.id}
+											 image={c.image}
+											 imageUp={c.imageUp}
+											 matched={c.matched}
+											 onClick={onCardClicked} />
+											 );
+  
   let gameHUD = undefined;
   if (!gameStarted) {
-	  gameHUD = <button onclick={() => dispatch()}>Play</button>;
+	  gameHUD = <button onclick={() => dispatch(gameInit())}>Play</button>;
   } else {
 	  gameHUD = <GameStatusView
 					gameComplete={gameComplete}
