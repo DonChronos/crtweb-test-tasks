@@ -32,18 +32,18 @@ export default function GameView() {
 		  dispatch(checkUnmatchedPair())
 	  }, 5000);
   }
-  
-  const cardViews = cards.map(c => <CardView key={c.id}
+  const getCardViews = () => cards.map(c => <CardView key={c.id}
 											 id={c.id}
 											 image={c.image}
 											 imageUp={c.imageUp}
 											 matched={c.matched}
 											 onClick={onCardClicked} />
 											 );
-  
+											 
+  const cardViews = getCardViews();
   let gameHUD = undefined;
   if (!gameStarted) {
-	  gameHUD = <button onclick={() => dispatch(gameInit())}>Play</button>;
+	  gameHUD = <button onClick={() => dispatch(gameInit())}>Play</button>;
   } else {
 	  gameHUD = <GameStatusView
 					gameComplete={gameComplete}

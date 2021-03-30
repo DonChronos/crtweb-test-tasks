@@ -12,21 +12,19 @@ export const gameSlice = createSlice({
 	secondId: undefined,
 	gameStarted: false,
 	gameComplete: false,
-	cards: []
+	cards: [],
   },
   reducers: {
-    increment: state => {
-      state.value += 1;
-    },
 	gameInit: {
 		reducer: (state, action) => {
+			console.log(action.payload);
 			state.gameStarted = true;
-			state.cards = action.cards;
+			state.cards = action.payload;
 		},
 		prepare: () => {
 			let cards = generateCardSet();
 			cards = shuffle(cards);
-			return { cards };
+			return { payload: cards };
 		},
 	},
 	checkUnmatchedPair: state => {
@@ -61,7 +59,14 @@ export const gameSlice = createSlice({
 		}
 	},
 	flipUpCard: (state, action) => {
-		let card = getCard(action.id, state.cards);
+		console.log(action);
+		console.log(state);
+		console.log({ key: state.cards });
+		console.log(state.cards);
+		let cards = state.cards;
+		console.log(cards);
+		let card = getCard(action.payload, state.cards);
+		console.log(card);
 		if (card.imageUp || card.matched) {
 			return;
 		}
@@ -93,10 +98,10 @@ export const gameSlice = createSlice({
 			state.secondId = undefined;
 			state.turnNo += 1;
 			}
-			state.firstId = action.id;
+			state.firstId = action.payload;
 			state.numClickWithinTurn = 1;
 			state.cards = state.cards.map(card => {
-				if (action.id === card.id) {
+				if (action.payload === card.id) {
 					card.imageUp = true;
 				}
 				return card;
@@ -105,15 +110,15 @@ export const gameSlice = createSlice({
 		let firstId = state.firstId;
 		let secondId = state.secondId;
 		if (state.numClickWithinTurn === 0) {
-			firstId = action.id;
+			firstId = action.payload;
 		} else {
-			secondId = action.id;
+			secondId = action.payload;
 		}
 		state.firstId = firstId;
 		state.secondId = secondId;
 		state.numClickWithinTurn += 1;
 		state.cards = state.cards.map(card => {
-			if (action.id === card.id) {
+			if (action.payload === card.id) {
 				card.imageUp = true;
 			}
 			return card;

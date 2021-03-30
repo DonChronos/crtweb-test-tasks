@@ -24,6 +24,8 @@ export function generateCardSet() {
 };
 
 export function getCard(id, cards) {
+	console.log(id);
+	console.log(cards);
     return cards.find(c => c.id === id)
 }
 
