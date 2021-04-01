@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import entities from './entities';
+import { useDispatch } from 'react-redux'; 
 
 export const flatSlice = createSlice({
   name: 'flat',
   initialState: {
-    flats: entities,
+    flats: [],
   },
   reducers: {
     increment: state => {
@@ -14,8 +14,34 @@ export const flatSlice = createSlice({
       // immutable state based off those changes
       state.value += 1;
     },
+	receiveList: (state, action) => {
+		console.log(action);
+		state.flats = action.payload;
+	}
   },
 });
+
+export const test = 'test';
+
+const receiveList = flatSlice.actions.receiveList;
+
+export const getFlatsAsync = () => (dispatch = useDispatch()) => {
+	(async () => {
+		try {
+			let response = await fetch('entities.json');
+			console.log(response);
+			console.log(receiveList);
+			if (response.ok) {
+				let data = await response.json();
+				dispatch(receiveList(data.response));
+			} else {
+				console.log('Error' + response.status);
+			}
+		} catch (e) {
+			console.log(e)
+		}
+	})();
+}
 
 /*export const { increment, decrement, incrementByAmount } = counterSlice.actions;
 
