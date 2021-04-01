@@ -1,118 +1,87 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import {
-  selectGameStarted,
-  selectGameComplete,
-  selectTurnNo,
-  selectPairsFound,
-  selectCards,
-  selectNumClick,
-  selectFirstId,
-  selectSecondId,
-  gameInit,
-  flipUpCard,
-  checkMatchedPair,
-  checkUnmatchedPair,
-} from './gameSlice';
+import React, { Component } from 'react';
 import './Game.css';
-import GameStatusView from './GameStatusView';
 import CardView from './cardView';
+import { connect } from 'react-redux'
+import { flipUpCard, checkUnmatchedPair, checkMatchedPair, initGame } from './actions';
+import GameStatusView from './GameStatusView';
 
 let timeOut = null;
 
-export default function GameView() {
-  const gameStarted = useSelector(selectGameStarted);
-  const gameComplete = useSelector(selectGameComplete);
-  const turnNo = useSelector(selectTurnNo);
-  const pairsFound = useSelector(selectPairsFound);
-  const cards = useSelector(selectCards);
-  const numClick = useSelector(selectNumClick);
-  const firstId = useSelector(selectFirstId);
-  const secondId = useSelector(selectSecondId);
-  const dispatch = useDispatch();
-  
-  const onCardClicked = id => {
-	  clearInterval(timeOut);
-	  dispatch(flipUpCard({id, numClick, firstId, secondId, cards, pairsFound}));
-	  console.log(numClick);
-	  dispatch(checkMatchedPair({numClick, firstId, secondId, cards, pairsFound}));
-	  timeOut = setTimeout(() => {
-		  dispatch(checkUnmatchedPair({numClick, firstId, secondId, cards}))
-	  }, 5000);
-  }
-  
-  const getCardViews = () => cards.map(c => <CardView key={c.id}
-											 id={c.id}
-											 image={c.image}
-											 imageUp={c.imageUp}
-											 matched={c.matched}
-											 onClick={onCardClicked} />
-											 );
-											 
-  const cardViews = getCardViews();
-  let gameHUD = undefined;
-  if (!gameStarted) {
-	  gameHUD = <button onClick={() => dispatch(gameInit())}>Play</button>;
-  } else {
-	  gameHUD = <GameStatusView
-					gameComplete={gameComplete}
-					turnNo={turnNo}
-					pairsFound={pairsFound}
-				/>;
-  }
+class Game extends Component {
+    render() {
+        const cardViews = this.getCardViews();
+        let gameHUD = undefined;
 
-  return (
-	<div className="game">
-		<header className="game_header">
-			<div className="game_title">Game in React</div>
-		</header>
-		<div className="game_status">
-			{gameHUD}
-		</div>
-		<div className="card_container">
-			{cardViews}
-		</div>
-	</div>
-  );
+        if (!this.props.gameStarted) {
+            gameHUD = <button onClick={this.props.onInitGame}>Play</button>;
+        } else {
+            gameHUD = <GameStatusView
+                gameComplete={this.props.gameComplete}
+                turnNo={this.props.turnNo}
+                pairsFound={this.props.pairsFound}
+				initGame={this.props.onInitGame}
+            />;
+        }
+
+        return (
+            <div className='game'>
+                <header className='game-header'>
+                    <div className='game-title'>A Memory game in React with Redux</div>
+                </header>
+                <div className='game-status'>
+                    {gameHUD}
+                </div>
+                <div className='card-container'>
+                    {cardViews}
+                </div>
+            </div>
+        );
+    }
+
+    getCardViews() {
+		console.log(this.props);
+        const cardViews = this.props.cards.map(c =>
+            <CardView key={c.id}
+                id={c.id}
+                image={c.image}
+                imageUp={c.imageUp}
+                matched={c.matched}
+                onClick={this.props.onCardClicked} />
+        );
+        return cardViews;
+    }
 }
-    /*<div>
-      <div className={styles.game}>
-        <button
-          className={styles.button}
-          aria-label="Increment value"
-          onClick={() => dispatch(increment())}
-        >
-          +
-        </button>
-        <span className={styles.value}>{count}</span>
-        <button
-          className={styles.button}
-          aria-label="Decrement value"
-          onClick={() => dispatch(decrement())}
-        >
-          -
-        </button>
-      </div>
-      <div className={styles.row}>
-        <input
-          className={styles.textbox}
-          aria-label="Set increment amount"
-          value={incrementAmount}
-          onChange={e => setIncrementAmount(e.target.value)}
-        />
-        <button
-          className={styles.button}
-          onClick={() =>
-            dispatch(incrementByAmount(Number(incrementAmount) || 0))
-          }
-        >
-          Add Amount
-        </button>
-        <button
-          className={styles.asyncButton}
-          onClick={() => dispatch(incrementAsync(Number(incrementAmount) || 0))}
-        >
-          Add Async
-        </button>
-      </div>
-    </div>*/
+
+
+const mapStateToProps = state => {
+    return {
+        cards: state.cards,
+        turnNo: state.turnNo,
+        gameComplete: state.gameComplete,
+        pairsFound: state.pairsFound,
+        gameStarted: state.gameStarted
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        onCardClicked: id => {
+            clearInterval(timeOut);
+            dispatch(flipUpCard(id));
+            dispatch(checkMatchedPair());
+            timeOut = setTimeout(() => {
+                dispatch(checkUnmatchedPair())
+            }, 4000);
+        },
+        onInitGame: () => {
+            dispatch(initGame());
+        }
+    }
+}
+
+const GameView = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Game)
+
+export default GameView;

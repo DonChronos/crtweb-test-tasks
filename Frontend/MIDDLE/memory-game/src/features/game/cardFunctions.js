@@ -1,7 +1,7 @@
 export function generateCardSet() {
     const cards = [];
     let id = 1;
-    for (let i = 1; i <= 18; i++) {
+    for (let i = 1; i <= 4; i++) {
         const card1 = {
             id: id,
             image: i,
@@ -35,12 +35,4 @@ export function cardsHaveIdenticalImages(id1, id2, cards) {
     } else {
         return false;
     }
-}
-
-export function getAllIndexes(cards, id1, id2) {
-	let indexes = [];
-	for (let i = 0; i < cards.length; i++) {
-		if (cards[i].id === id1 || cards[i].id === id2) indexes.push(i);
-	}
-	return indexes;
 }
