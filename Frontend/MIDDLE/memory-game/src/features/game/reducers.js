@@ -94,6 +94,14 @@ function memoryGame(state = initialState, action) {
             return Object.assign({}, initialState, { gameStarted: true, cards: memoryCards(cards, shuffleCards()) });
 
         case CHECK_UNMATCHED_PAIR:
+			if (state.numClicksWithinTurn === 1) {
+				return Object.assign({}, state, {
+					numClicksWithinTurn: 0,
+					firstId: undefined,
+					turnNo: state.turnNo + 1,
+					cards: memoryCards(state.cards, flipDownPair(state.firstId, state.firstId))
+				});
+			}
             if (state.numClicksWithinTurn === 2 && !cardsHaveIdenticalImages(state.firstId, state.secondId, state.cards)) {
                 // PAIR DID NOT MATCH
                 return Object.assign({}, state, {
