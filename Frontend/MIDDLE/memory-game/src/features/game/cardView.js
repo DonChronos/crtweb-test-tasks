@@ -1,4 +1,4 @@
-import styles from './Game.module.css';
+import './Game.css';
 
 function CardView(props) {
     const imPath = `${window.location.href}/images/${props.image}.jpg`;
@@ -8,7 +8,7 @@ function CardView(props) {
     if (props.matched) {
         className = className + ' matched';
     }
-    const classNameWithAnimation = className + ' animate';
+    const classNameActive = className + ' active';
 
     return (
         <div
@@ -17,13 +17,13 @@ function CardView(props) {
                     props.onClick(props.id);
                 }
             }}
-            className={props.imageUp ? classNameWithAnimation : className}
+            className={props.imageUp ? classNameActive : className}
         >
-            <div className={styles.flip_card_inner}>
-                <div className={styles.flip_card_front}>
+            <div className="flip_card_inner">
+                <div className="flip_card_front">
                     <img src={`${backPath}`} draggable='false' alt='' />
                 </div>
-                <div className={styles.flip_card_back}>
+                <div className="flip_card_back">
                     <img src={`${imPath}`} draggable='false' alt='' />
                 </div>
             </div>

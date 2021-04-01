@@ -36,3 +36,11 @@ export function cardsHaveIdenticalImages(id1, id2, cards) {
         return false;
     }
 }
+
+export function getAllIndexes(cards, id1, id2) {
+	let indexes = [];
+	for (let i = 0; i < cards.length; i++) {
+		if (cards[i].id === id1 || cards[i].id === id2) indexes.push(i);
+	}
+	return indexes;
+}

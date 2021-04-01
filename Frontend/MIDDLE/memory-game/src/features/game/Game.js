@@ -14,7 +14,7 @@ import {
   checkMatchedPair,
   checkUnmatchedPair,
 } from './gameSlice';
-import styles from './Game.module.css';
+import './Game.css';
 import GameStatusView from './GameStatusView';
 import CardView from './cardView';
 
@@ -34,6 +34,7 @@ export default function GameView() {
   const onCardClicked = id => {
 	  clearInterval(timeOut);
 	  dispatch(flipUpCard({id, numClick, firstId, secondId, cards, pairsFound}));
+	  console.log(numClick);
 	  dispatch(checkMatchedPair({numClick, firstId, secondId, cards, pairsFound}));
 	  timeOut = setTimeout(() => {
 		  dispatch(checkUnmatchedPair({numClick, firstId, secondId, cards}))
@@ -61,14 +62,14 @@ export default function GameView() {
   }
 
   return (
-	<div className={styles.game}>
-		<header className={styles.game_header}>
-			<div className={styles.game_title}>Game in React</div>
+	<div className="game">
+		<header className="game_header">
+			<div className="game_title">Game in React</div>
 		</header>
-		<div className={styles.game_status}>
+		<div className="game_status">
 			{gameHUD}
 		</div>
-		<div className={styles.card_container}>
+		<div className="card_container">
 			{cardViews}
 		</div>
 	</div>

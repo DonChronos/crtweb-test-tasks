@@ -72,12 +72,6 @@ img {
 .flip_card_inner {
   width: 110px;
   height: 110px;
-  transition: transform 0.7s;
-  transform-style: preserve-3d;
-}
-
-.animate div {
-  transform: rotateY(180deg);
 }
 
 .flip_card_front,
@@ -89,9 +83,18 @@ img {
   backface-visibility: hidden;
 }
 
-.flip_card_back {
-  transform: rotateY(180deg);
+.flip_card_back { 
+	display: none;
 }
+
+.active .flip_card_back {
+	display: block;
+}
+
+.active > .flip_card_inner > .flip_card_back {
+	display: block;
+}
+
 
 body {
   user-select: none; /* supported by Chrome and Opera */

@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import shuffle from 'shuffle-array';
-import { generateCardSet, getCard, cardsHaveIdenticalImages } from './cardFunctions';
+import { generateCardSet, getCard, cardsHaveIdenticalImages, getAllIndexes } from './cardFunctions';
 
 
 export const gameSlice = createSlice({
@@ -8,7 +8,7 @@ export const gameSlice = createSlice({
   initialState: {
     turnNo: 1,
 	pairsFound: 0,
-	numClickWithinTurn: 0,
+	numClick: 0,
 	firstId: undefined,
 	secondId: undefined,
 	gameStarted: false,
@@ -29,47 +29,62 @@ export const gameSlice = createSlice({
 		},
 	},
 	checkUnmatchedPair: (state, action) => {
+		console.log(action);
+		if (action.payload.numClick === 1) {
+			let foundCardIndex = action.payload.cards.findIndex(card => action.payload.firstId === card.id);
+			state.cards[foundCardIndex].imageUp = false;
+		}
 		if (action.payload.numClick === 2 && !cardsHaveIdenticalImages(action.payload.firstId, action.payload.secondId, action.payload.cards)) {
-			state.numClickWithinTurn = 0;
+			let indexes = [];
+			state.numClick = 0;
 			state.firstId = undefined;
 			state.secondId = undefined;
 			state.turnNo += 1;
-			state.cards = action.payload.cards.map(card => {
+			indexes = getAllIndexes(action.payload.cards, action.payload.firstId, action.payload.secondId);
+			state.cards[indexes[0]].imageUp = false;
+			state.cards[indexes[1]].imageUp = false;
+			/*state.cards = action.payload.cards.map(card => {
 				if (action.payload.firstId === card.id || action.payload.secondId === card.id) {
 					card.imageUp = false;
 				}
 				return card;
 			});
+			*/
 		}
 	},
 	checkMatchedPair: (state, action) => {
+		console.log(action);
 		if (action.payload.numClick === 2 && cardsHaveIdenticalImages(action.payload.firstId, action.payload.secondId, action.payload.cards)) {
+			let indexes = [];
 			let pairsFound = action.payload.pairsFound + 1;
 			state.gameComplete = false;
 			if (pairsFound === action.payload.cards.length / 2) {
 				state.gameComplete = true;
 			}
 			state.turnNo += 1;
-			state.numClickWithinTurn = 0;
-			state.cards = action.payload.cards.map(card => {
+			state.numClick = 0;
+			indexes = getAllIndexes(action.payload.cards, action.payload.firstId, action.payload.secondId);
+			state.cards[indexes[0]].matched = true;
+			state.cards[indexes[1]].matched = true;
+			/*state.cards = action.payload.cards.map(card => {
 				if (action.payload.firstId === card.id || action.payload.secondId === card.id) {
 					card.matched = true;
 				}
 				return card;
-			})
+			});
+			*/
 		}
 	},
 	flipUpCard: (state, action) => {
-		console.log(action);
+		console.log(action.payload);
 		let id = action.payload.id;
 		let cards = action.payload.cards;
-		console.log(cards);
 		let card = getCard(id, cards);
-		console.log(card);
 		if (card.imageUp || card.matched) {
 			return;
 		}
 		if (action.payload.numClick === 2) {
+			let indexes = [];
 			if (cardsHaveIdenticalImages(action.payload.firstId, action.payload.secondId, action.payload.cards)) {
 			state.pairsFound += 1;
 			state.gameComplete = false;
@@ -77,28 +92,36 @@ export const gameSlice = createSlice({
 				state.gameComplete = true;
 			}
 			state.turnNo += 1;
-			state.numClickWithinTurn = 0;
-			state.cards = action.payload.cards.map(card => {
+			state.numClick = 0;
+			indexes = getAllIndexes(action.payload.cards, action.payload.firstId, action.payload.secondId);
+			state.cards[indexes[0]].matched = true;
+			state.cards[indexes[1]].matched = true;
+			/*state.cards = action.payload.cards.map(card => {
 				if (action.payload.firstId === card.id || action.payload.secondId === card.id) {
 					card.matched = true;
 				}
 				return card;
 			});
+			*/
 			}
 			if (!cardsHaveIdenticalImages(action.payload.firstId, action.payload.secondId, action.payload.cards)) {
-			state.numClickWithinTurn = 0;
+			state.numClick = 0;
 			state.firstId = undefined;
 			state.secondId = undefined;
 			state.turnNo += 1;
-			state.cards = action.payload.cards.map(card => {
+			indexes = getAllIndexes(action.payload.cards, action.payload.firstId, action.payload.secondId);
+			state.cards[indexes[0]].imageUp = false;
+			state.cards[indexes[1]].imageUp = false;
+			/*state.cards = action.payload.cards.map(card => {
 				if (action.payload.firstId === card.id || action.payload.secondId === card.id) {
 					card.imageUp = false;
 				}
 				return card;
 			});
+			*/
 			}
 			state.firstId = id;
-			state.numClickWithinTurn = 1;
+			state.numClick = 1;
 			let foundCardIndex = action.payload.cards.findIndex(card => id === card.id);
 			state.cards[foundCardIndex].imageUp = true;
 		}
@@ -111,7 +134,8 @@ export const gameSlice = createSlice({
 		}
 		state.firstId = firstId;
 		state.secondId = secondId;
-		state.numClickWithinTurn += 1;
+		let newNumClick = action.payload.numClick;
+		state.numClick = newNumClick + 1;
 		let foundCardIndex = action.payload.cards.findIndex(card => id === card.id);
 		state.cards[foundCardIndex].imageUp = true;
 	},
@@ -143,7 +167,7 @@ export const selectGameComplete = state => state.game.gameComplete;
 export const selectTurnNo = state => state.game.turnNo;
 export const selectPairsFound = state => state.game.pairsFound;
 export const selectCards = state => state.game.cards;
-export const selectNumClick = state => state.game.numClickWithinTurn;
+export const selectNumClick = state => state.game.numClick;
 export const selectFirstId = state => state.game.firstId;
 export const selectSecondId = state => state.game.secondId;
 
