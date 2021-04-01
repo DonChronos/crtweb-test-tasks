@@ -15,7 +15,10 @@ const initialState = {
     gameComplete: false,
     cards: [],
 	gameStarted: false,
+	second: 0,
+	minute: 0,
 };
+let interval = null;
 
 // The reducer for the memory card array
 // state is an array of cards
@@ -68,6 +71,21 @@ function memoryCards(state = [], action) {
 // state is an object with game state and an array of cards
 function memoryGame(state = initialState, action) {
     switch (action.type) {
+		case "TIMER_TICK":
+			if (!state.gameComplete) {
+			let second = state.second;
+			let minute = state.minute;
+			second++;
+			if (second === 60) {
+				minute++;
+				second = 0;
+			}
+			return Object.assign({}, state, { second, minute });
+			}
+			return state;
+		case "TIMER_STOP":
+		
+		break;
         case GENERATE_PAIRS:
             return Object.assign({}, initialState, { cards: memoryCards(initialState.cards, generatePairs(action.numPairs)) });
 

@@ -6,6 +6,7 @@ import { flipUpCard, checkUnmatchedPair, checkMatchedPair, initGame } from './ac
 import GameStatusView from './GameStatusView';
 
 let timeOut = null;
+let timer = null;
 
 class Game extends Component {
     render() {
@@ -13,13 +14,17 @@ class Game extends Component {
         let gameHUD = undefined;
 
         if (!this.props.gameStarted) {
-            gameHUD = <button onClick={this.props.onInitGame}>Play</button>;
+            gameHUD = <button onClick={() => {
+				this.props.onInitGame();
+				this.props.startTimer()}}>Play</button>;
         } else {
             gameHUD = <GameStatusView
                 gameComplete={this.props.gameComplete}
                 turnNo={this.props.turnNo}
                 pairsFound={this.props.pairsFound}
 				initGame={this.props.onInitGame}
+				second={this.props.second}
+				minute={this.props.minute}
             />;
         }
 
@@ -59,7 +64,9 @@ const mapStateToProps = state => {
         turnNo: state.turnNo,
         gameComplete: state.gameComplete,
         pairsFound: state.pairsFound,
-        gameStarted: state.gameStarted
+        gameStarted: state.gameStarted,
+		second: state.second,
+		minute: state.minute,
     }
 }
 
@@ -75,7 +82,17 @@ const mapDispatchToProps = dispatch => {
         },
         onInitGame: () => {
             dispatch(initGame());
-        }
+        },
+		startTimer: () => {
+			clearInterval(timer);
+			timer = setInterval(() => dispatch({ type: "TIMER_TICK" }), 1000);
+			dispatch({ type: "TIMER_START" });
+			dispatch({ type: "TIMER_TICK" });
+		},
+		stopTimer: () => {
+			clearInterval(timer);
+			dispatch({ type: "TIMER_STOP" });
+		}
     }
 }
 
