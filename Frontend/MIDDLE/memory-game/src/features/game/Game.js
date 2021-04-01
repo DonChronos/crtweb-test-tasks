@@ -4,6 +4,7 @@ import CardView from './cardView';
 import { connect } from 'react-redux'
 import { flipUpCard, checkUnmatchedPair, checkMatchedPair, initGame } from './actions';
 import GameStatusView from './GameStatusView';
+import GameResults from './gameResults';
 
 let timeOut = null;
 let timer = null;
@@ -12,6 +13,8 @@ class Game extends Component {
     render() {
         const cardViews = this.getCardViews();
         let gameHUD = undefined;
+		let gameResults = undefined;
+		gameResults = <GameResults results={this.props.results}/>
 
         if (!this.props.gameStarted) {
             gameHUD = <button onClick={() => {
@@ -36,6 +39,9 @@ class Game extends Component {
                 <div className='game-status'>
                     {gameHUD}
                 </div>
+				<div className='game-results'>
+					{gameResults}
+				</div>
                 <div className='card-container'>
                     {cardViews}
                 </div>
@@ -44,7 +50,6 @@ class Game extends Component {
     }
 
     getCardViews() {
-		console.log(this.props);
         const cardViews = this.props.cards.map(c =>
             <CardView key={c.id}
                 id={c.id}
@@ -67,6 +72,7 @@ const mapStateToProps = state => {
         gameStarted: state.gameStarted,
 		second: state.second,
 		minute: state.minute,
+		results: state.results
     }
 }
 
@@ -78,7 +84,7 @@ const mapDispatchToProps = dispatch => {
             dispatch(checkMatchedPair());
             timeOut = setTimeout(() => {
                 dispatch(checkUnmatchedPair())
-            }, 4000);
+            }, 5000);
         },
         onInitGame: () => {
             dispatch(initGame());

@@ -1,7 +1,7 @@
 export function generateCardSet() {
     const cards = [];
     let id = 1;
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 18; i++) {
         const card1 = {
             id: id,
             image: i,
@@ -24,8 +24,6 @@ export function generateCardSet() {
 };
 
 export function getCard(id, cards) {
-	console.log(id);
-	console.log(cards);
     return cards.find(c => c.id === id)
 }
 

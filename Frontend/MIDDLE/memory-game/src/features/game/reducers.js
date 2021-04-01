@@ -1,7 +1,7 @@
 import {
     GENERATE_PAIRS, FLIP_UP_CARD, SHUFFLE_CARDS, CHECK_UNMATCHED_PAIR, markPairAsMatched,
     MARK_PAIR_AS_MATCHED, flipDownPair, FLIP_DOWN_PAIR, INIT_GAME,
-    shuffleCards, checkUnmatchedPair, checkMatchedPair, generatePairs, SHOW_NUM_CARDS_SELECTION, CHECK_MATCHED_PAIR
+    shuffleCards, checkUnmatchedPair, checkMatchedPair, generatePairs, CHECK_MATCHED_PAIR
 } from "./actions";
 import shuffle from 'shuffle-array';
 import { generateCardSet, getCard, cardsHaveIdenticalImages } from './cardFunctions';
@@ -17,8 +17,8 @@ const initialState = {
 	gameStarted: false,
 	second: 0,
 	minute: 0,
+	results: [],
 };
-let interval = null;
 
 // The reducer for the memory card array
 // state is an array of cards
@@ -111,14 +111,17 @@ function memoryGame(state = initialState, action) {
                 // PAIR MATCHED
                 const pairsFound = state.pairsFound + 1;
                 let gameComplete = false;
+				let results = state.results;
                 if (pairsFound === state.cards.length / 2) {
                     gameComplete = true;
+					results.push({ turn: state.turnNo, minute: state.minute, second: state.second });
                 }
                 return Object.assign({}, state, {
                     pairsFound,
                     turnNo: state.turnNo + 1,
                     numClicksWithinTurn: 0,
                     gameComplete,
+					results,
                     cards: memoryCards(state.cards, markPairAsMatched(state.firstId, state.secondId))
                 });
             }
