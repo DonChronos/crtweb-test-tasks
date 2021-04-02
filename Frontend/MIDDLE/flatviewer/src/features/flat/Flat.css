@@ -1,0 +1,29 @@
+.flats {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	margin: auto;
+	width: 50%;
+}
+
+@media (max-width: 500px) {
+	.flats {
+		width: 80%;
+	}
+}
+
+.flat {
+	margin-bottom: 10px;
+	background-color: #666666;
+	color: white;
+	border-radius: 10px;
+	box-shadow: 4px 4px 4px 1px black;
+}
+
+.button {
+	border-radius: 5px;
+}
+
+p {
+	padding-left: 5px;
+}

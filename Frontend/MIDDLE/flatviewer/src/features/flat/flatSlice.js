@@ -5,25 +5,25 @@ export const flatSlice = createSlice({
   name: 'flat',
   initialState: {
     flats: [],
+	favourites: {},
   },
   reducers: {
-    increment: state => {
-      // Redux Toolkit allows us to write "mutating" logic in reducers. It
-      // doesn't actually mutate the state because it uses the Immer library,
-      // which detects changes to a "draft state" and produces a brand new
-      // immutable state based off those changes
-      state.value += 1;
-    },
 	receiveList: (state, action) => {
-		console.log(action);
 		state.flats = action.payload;
-	}
+	},
+	addFavourite: (state, action) => {
+		state.favourites[action.payload] = true;
+	},
+	removeFavourite: (state, action) => {
+		state.favourites[action.payload] = false;
+	},
   },
 });
 
-export const test = 'test';
 
 const receiveList = flatSlice.actions.receiveList;
+
+export const { addFavourite, removeFavourite } = flatSlice.actions;
 
 export const getFlatsAsync = () => (dispatch = useDispatch()) => {
 	(async () => {
